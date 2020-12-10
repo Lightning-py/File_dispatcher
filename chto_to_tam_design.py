@@ -24,6 +24,7 @@ class Ui_Dialog(object):
         self.listWidget = QtWidgets.QListWidget(Dialog)
         self.listWidget.setGeometry(QtCore.QRect(0, 35, 1300, 1015))
         self.listWidget.setObjectName("listWidget")
+        self.listWidget.addItem('чтобы увидеть файлы в нужной папке введите её адрес')
 
         self.scripts_LineEdit = QtWidgets.QLineEdit(Dialog)
         self.scripts_LineEdit.setGeometry(QtCore.QRect(1305, 35, 545, 30))
@@ -32,6 +33,8 @@ class Ui_Dialog(object):
         self.scripts_listWidget = QtWidgets.QListWidget(Dialog)
         self.scripts_listWidget.setObjectName("listwidget_scripts_list")
         self.scripts_listWidget.setGeometry(QtCore.QRect(1305, 69, 545, 980))
+        self.scripts_listWidget.addItem('чтобы найти файлы .py введите адрес папки в  строку сверху ^')
+        self.scripts_listWidget.addItem('чтобы запустить файл просто введите его адрес в строку и нажмите Enter')
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
