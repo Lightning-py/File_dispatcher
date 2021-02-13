@@ -1,10 +1,12 @@
 import os
 import chto_to_tam_design as design
+from copy import deepcopy
 import sys
 from PyQt5 import QtWidgets
+from PyQt5 import QtGui
 
 def write_log(exc):
-	f = open('/home/sergey/fm/logs.txt', 'w')
+	f = open(os.getcwd() + '/logs.txt', 'w')
 	f.write(str(exc))
 	f.close()
 
@@ -37,7 +39,17 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
 
 	def __init__(self):
 		super().__init__()
+
+		# self.set_script("")
+
+
 		self.setupUi(self)
+
+		self.listWidget.setFont(QtGui.QFont("Fira Code Light", 11, QtGui.QFont.Bold))
+		self.scripts_listWidget.setFont(QtGui.QFont("Fira Code Light", 11, QtGui.QFont.Bold))
+		self.LineEdit.setFont(QtGui.QFont("Fira Code Light", 11, QtGui.QFont.Bold))
+		self.scripts_LineEdit.setFont(QtGui.QFont("Fira Code Light", 11, QtGui.QFont.Bold))
+		self.finder_LineEdit.setFont(QtGui.QFont("Fira Code Light", 11, QtGui.QFont.Bold))
 
 		self.LineEdit.returnPressed.connect(self.set_items)
 
@@ -45,11 +57,11 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
 
 		self.finder_LineEdit.returnPressed.connect(self.set_scripts_items)
 
+		self.listWidget.itemDoubleClicked.connect(self.new_search)
+
 		self.listWidget.itemClicked.connect(self.selectionChanged)
 
 		self.scripts_listWidget.itemDoubleClicked.connect(self.start_program_on_python)
-
-		self.listWidget.itemDoubleClicked.connect(self.new_search)
 
 	def new_search(self, item):
 		dir_now = self.LineEdit.text() + item.text()
@@ -82,7 +94,7 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
 					array[1] = 'full_dirs'
 			else:
 				self.listWidget.addItem('нет файлов в этой папке')
-		#____________________________________________________функция только для линукс
+		#____________________________________________________only for Linux
 		elif os.path.isfile(dir_now) and (dir_now.endswith('.jpg') or dir_now.endswith('.ico') or dir_now.endswith('.png')):
 			os.system('gwenview ' +  dir_now)
 		#____________________________________________________
@@ -96,18 +108,72 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
 			return None	
 
 	def selectionChanged(self, item):
+		text = deepcopy(item.text())
 		if item.text() == 'd---->':
 			self.set_items(arg='full_dirs', arg2=array[1])
 		elif item.text() == 'f---->':
 			self.set_items(arg=array[0], arg2='full_files')
+		elif item.text() == '    delete':
+			if os.path.isdir(self.LineEdit.text() + self.listWidget.item(self.listWidget.currentRow() - 1).text()):
+				os.rmdir(self.LineEdit.text() + self.listWidget.item(self.listWidget.currentRow() - 1).text())
+			elif os.path.isfile(self.LineEdit.text() + self.listWidget.item(self.listWidget.currentRow() - 1).text()):
+				os.remove(self.LineEdit.text() + self.listWidget.item(self.listWidget.currentRow() - 1).text())
+			self.set_items()
+		# elif item.text() == '    rename':
+
+
 		else:
-			self.listWidget.clearSelection()
 			if os.path.isdir(self.LineEdit.text() + item.text()):
 
 				result = file_search(self.LineEdit.text())
-				self.listWidget.addItems(result[0][ : result[0].index(item.text()) + 1] + ['	delete', '	rename'] + result[0][result[0].index(item.text()) + 1: ])
-			elif os.path.isfile(self.LineEdit.text() + item.text()):
+				self.listWidget.clear()
+				
+
+
+
+
+				self.listWidget.addItem(f'|>	{len(result[0])}				папок---------------------------------------------------------------------------------')
+				if len(result[0]) != 0:
+					self.listWidget.addItems(result[0][ : result[0].index(text) + 1] + ['    delete', '    rename'] + result[0][result[0].index(text) + 1: ])
+				else:
+					self.listWidget.addItem('в этой папке нет вложенных папок')
+				self.listWidget.addItem(f'|>	{len(result[1])}				файлов--------------------------------------------------------------------------------')
+				if len(result[1]) != 0:
+					if len(result[1]) >= 16:
+						self.listWidget.addItems(result[1][ : 15] + ['f---->'])
+					else:
+						self.listWidget.addItems(result[1])
+				else:
+					self.listWidget.addItem('нет файлов в этой папке')
+
+
+
+
+
+			elif os.path.isfile(self.LineEdit.text() + text):
 				result = file_search(self.LineEdit.text())
+				self.listWidget.clear()
+
+
+				self.listWidget.addItem(f'|>	{len(result[0])}				папок---------------------------------------------------------------------------------')
+				if len(result[0]) != 0:
+					if len(result[0]) >= 16:
+						self.listWidget.addItems(result[0][ : 15] + ['d---->'])
+					else:
+						self.listWidget.addItems(result[0])
+				else:
+					self.listWidget.addItem('в этой папке нет вложенных папок')
+				self.listWidget.addItem(f'|>	{len(result[1])}				файлов--------------------------------------------------------------------------------')
+				if len(result[1]) != 0:
+					self.listWidget.addItems(result[1][ : result[1].index(text) + 1] + ['    delete', '    rename'] + result[1][result[1].index(text) + 1: ])
+				else:
+					self.listWidget.addItem('нет файлов в этой папке')
+
+
+
+
+
+
 
 	def set_items(self, arg='hide_dirs', arg2='hide_files'):
 		if self.LineEdit.text() != "":

@@ -9,30 +9,26 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
-f = open('/home/sergey/fm/settings.txt')
-
-list_ = []
-
-for i in f:
-    list_.append(i)
-f.close()
+import os
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         #создаем окошко
         #----------------------------------------------------------------- функция только для создателя (ну либо пишите свой адрес картинки)
-        Dialog.setWindowIcon(QtGui.QIcon(list_[0][0 : -1] + 'explorer.ico'))
+        Dialog.setWindowIcon(QtGui.QIcon(os.getcwd() + '/explorer.ico'))
         #----------------------------------------------------------------- конец
         Dialog.setObjectName("not_Dialog")
         Dialog.title = "qwe"
         Dialog.resize(1920, 1080)
 
+
+
         #создаем первую строку ввода
         self.LineEdit = QtWidgets.QLineEdit(Dialog)
         self.LineEdit.setObjectName("LineEdit")
         self.LineEdit.setGeometry(61, 1, 1000, 30)
-        self.LineEdit.setText('')
+        self.LineEdit.setFont(QtGui.QFont("Droid Sans Mono", 11, QtGui.QFont.Bold))
+        self.LineEdit.setText('адрес')
         # self.LineEdit.setStyleSheet('background-color:#333333')
 
         #создаем виджет который отображает результаты
@@ -41,6 +37,8 @@ class Ui_Dialog(object):
         self.listWidget.setObjectName("listWidget")
         self.listWidget.addItem('чтобы увидеть файлы в нужной папке введите путь к папке')
         # self.listWidget.setStyleSheet('background-color:#333333')
+
+        self.menu = QtWidgets.QMenuBar(self.listWidget)
 
         #создаем вторую строку ввода
         self.scripts_LineEdit = QtWidgets.QLineEdit(Dialog)
