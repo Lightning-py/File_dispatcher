@@ -4,6 +4,17 @@ from copy import deepcopy
 import sys
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
+from pyperclip import copy
+
+data = {}
+
+def get_comands():
+	f = open('./settings.txt')
+	global data
+	for i in f:
+		data[i[0 : i.index("'") - 2]] = i[i.index("'") + 1 : ].replace('\n', '')[ : -1]
+
+get_comands()
 
 def write_log(exc):
 	f = open(os.getcwd() + '/logs.txt', 'w')
@@ -96,10 +107,12 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
 				self.listWidget.addItem('нет файлов в этой папке')
 		#____________________________________________________only for Linux
 		elif os.path.isfile(dir_now) and (dir_now.endswith('.jpg') or dir_now.endswith('.ico') or dir_now.endswith('.png')):
-			os.system('gwenview ' +  dir_now)
+			os.system(data['images_show_comand'] +  dir_now)
 		#____________________________________________________
 		elif os.path.isfile(dir_now) and (dir_now.endswith('.json') or dir_now.endswith('.py')):
-			os.system('code ' + dir_now)
+			os.system(data['files_open_comand'] + dir_now)
+		elif os.path.isfile(dir_now):
+			os.system(data['other_file_open_comand'] + dir_now)
 		
 
 	def start_program_on_python(self, item):
@@ -120,6 +133,8 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
 				os.remove(self.LineEdit.text() + self.listWidget.item(self.listWidget.currentRow() - 1).text())
 			self.set_items()
 		# elif item.text() == '    rename':
+		elif item.text() == '    copy':
+			copy()
 
 
 		else:
@@ -134,7 +149,7 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
 
 				self.listWidget.addItem(f'|>	{len(result[0])}				папок---------------------------------------------------------------------------------')
 				if len(result[0]) != 0:
-					self.listWidget.addItems(result[0][ : result[0].index(text) + 1] + ['    delete', '    rename'] + result[0][result[0].index(text) + 1: ])
+					self.listWidget.addItems(result[0][ : result[0].index(text) + 1] + ['    delete', '    rename', '    copy'] + result[0][result[0].index(text) + 1: ])
 				else:
 					self.listWidget.addItem('в этой папке нет вложенных папок')
 				self.listWidget.addItem(f'|>	{len(result[1])}				файлов--------------------------------------------------------------------------------')
@@ -168,9 +183,6 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
 					self.listWidget.addItems(result[1][ : result[1].index(text) + 1] + ['    delete', '    rename'] + result[1][result[1].index(text) + 1: ])
 				else:
 					self.listWidget.addItem('нет файлов в этой папке')
-
-
-
 
 
 
