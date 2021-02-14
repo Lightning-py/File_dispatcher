@@ -11,11 +11,60 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import os
 
+
+data = {}
+
+def get_comands():
+	f = open('./settings.txt')
+	global data
+	for i in f:
+		data[i[0 : i.index("'") - 2]] = i[i.index("'") + 1 : ].replace('\n', '')[ : -1]
+
+get_comands()
+
+def write_file(file):
+    f = open('./settings.txt', 'r')
+    content = []
+    for i in f:
+        content.append(i)
+    f.close()
+    f = open('./settings.txt', 'w')
+    for i in content:
+        if i.startswith('last_file: '):
+            f.write('last_file: ' + file)
+        else:
+            f.write(i)
+    
+
+
+def file_search(cwd):
+		try:
+			results = [str(i)[ str(i).index("'")  + 1 : -2 ] for i in os.scandir(cwd)]
+		except:
+			print("it's an error")
+			return []
+
+		files = [ [], [] ]
+
+		for i in results:
+			if os.path.isfile(cwd) == False and cwd.endswith("/") == False:
+				if os.path.isdir(cwd + "/" + i):
+					files[0].append(i)
+				else:
+					files[1].append(i)
+			else:
+				if os.path.isdir(cwd + "/" + i):
+					files[0].append(i)
+				else:
+					files[1].append(i)
+		return files
+
+
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         #создаем окошко
         #----------------------------------------------------------------- функция только для создателя (ну либо пишите свой адрес картинки)
-        Dialog.setWindowIcon(QtGui.QIcon(os.getcwd() + '/explorer.ico'))
+        Dialog.setWindowIcon(QtGui.QIcon(os.getcwd() + '/explorer_.ico'))
         #----------------------------------------------------------------- конец
         Dialog.setObjectName("not_Dialog")
         Dialog.title = "qwe"
@@ -59,6 +108,48 @@ class Ui_Dialog(object):
         self.scripts_listWidget.addItem('нажмите Enter чтобы запустить файл с расширением .py')
         # self.scripts_listWidget.setStyleSheet('background-color:#333333')
 
+        if data['last_file'] != '':
+            results = file_search(data['last_file'])
+            self.LineEdit.setText(data['last_file'])
+            self.listWidget.addItem(f'|>	{len(results[0])}				папок---------------------------------------------------------------------------------')
+            if len(results[0]) != 0:
+                if len(results[0]) >= 16:
+                    self.listWidget.addItems(results[0][ : 16] + ['d---->'])
+                else:
+                    self.listWidget.addItems(results[0])
+            if len(results[1]) != 0:
+                if len(results[1]) >= 16:
+                    self.listWidget.addItems(results[1][0 : 16] + ['f---->'])
+                else:
+                    self.listWidget.addItems(results[1])
+        elif os.name == 'posix':
+            results = file_search('/')
+            self.LineEdit.setText('/')
+            self.listWidget.addItem(f'|>	{len(results[0])}				папок---------------------------------------------------------------------------------')
+            if len(results[0]) != 0:
+                if len(results[0]) >= 16:
+                    self.listWidget.addItems(results[0][ : 16] + ['d---->'])
+                else:
+                    self.listWidget.addItems(results[0])
+            if len(results[1]) != 0:
+                if len(results[1]) >= 16:
+                    self.listWidget.addItems(results[1][0 : 16] + ['f---->'])
+                else:
+                    self.listWidget.addItems(results[1])
+        elif os.name == 'nt':
+            results = file_search('C:\ '.replace(' ', ''))
+            self.LineEdit.setText('C:\ '.replace(' ', ''))
+            self.listWidget.addItem(f'|>	{len(results[0])}				папок---------------------------------------------------------------------------------')
+            if len(results[0]) != 0:
+                if len(results[0]) >= 16:
+                    self.listWidget.addItems(results[0][ : 16] + ['d---->'])
+                else:
+                    self.listWidget.addItems(results[0])
+            if len(results[1]) != 0:
+                if len(results[1]) >= 16:
+                    self.listWidget.addItems(results[1][0 : 16] + ['f---->'])
+                else:
+                    self.listWidget.addItems(results[1])
 
 
 
@@ -70,3 +161,31 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "file dispatcher"))
+
+
+class Ui_get(object):
+    def setupUi(self, Dialog1):
+        #создаем окошко
+        #----------------------------------------------------------------- функция только для создателя (ну либо пишите свой адрес картинки)
+        Dialog1.setWindowIcon(QtGui.QIcon(os.getcwd() + '/explorer.ico'))
+        #----------------------------------------------------------------- конец
+        Dialog1.setObjectName("not_Dialog")
+        Dialog1.title = "qwe"
+        Dialog1.resize(240, 120)
+
+
+
+        #создаем первую строку ввода
+        self.LineEdit = QtWidgets.QLineEdit(Dialog1)
+        self.LineEdit.setObjectName("LineEdit")
+        self.LineEdit.setGeometry(61, 1, 1000, 30)
+        self.LineEdit.setFont(QtGui.QFont("Droid Sans Mono", 11, QtGui.QFont.Bold))
+
+        self.retranslateUi(Dialog1)
+        QtCore.QMetaObject.connectSlotsByName(Dialog1)
+
+        self.retranslateUi(Dialog1)
+        QtCore.QMetaObject.connectSlotsByName(Dialog1)
+    def retranslateUi(self, Dialog1):
+        _translate = QtCore.QCoreApplication.translate
+        Dialog1.setWindowTitle(_translate("Dialog", "file dispatcher"))

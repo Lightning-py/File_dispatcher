@@ -6,6 +6,20 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from pyperclip import copy
 
+
+def write_file(file):
+    f = open('./settings.txt', 'r')
+    content = []
+    for i in f:
+        content.append(i)
+    f.close()
+    f = open('./settings.txt', 'w')
+    for i in content:
+        if i.startswith('last_file: '):
+            f.write('last_file: ' + "'" + file + "'")
+        else:
+            f.write(i)
+
 data = {}
 
 def get_comands():
@@ -46,6 +60,13 @@ def file_search(cwd):
 
 array = ['hide_dirs', 'hide_files']
 
+class App(QtWidgets.QDialog, design.Ui_get):
+	def __init__(self):
+		super().__init__()
+
+		self.setupUi(self)
+		
+
 class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
 
 	def __init__(self):
@@ -74,12 +95,19 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
 
 		self.scripts_listWidget.itemDoubleClicked.connect(self.start_program_on_python)
 
+
+
+
+	def backspace_pressed(self):
+		self.LineEdit.setText('hello')
+
 	def new_search(self, item):
 		dir_now = self.LineEdit.text() + item.text()
 		if os.path.isdir(dir_now) and not dir_now.endswith('/'):
 			dir_now += '/'
 			self.LineEdit.setText(self.LineEdit.text() + '/')
 		if os.path.isdir(dir_now):
+			write_file(dir_now)
 			self.listWidget.clear()
 			os.system('cd ' + dir_now)
 			result = file_search(dir_now)
@@ -105,13 +133,13 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
 					array[1] = 'full_dirs'
 			else:
 				self.listWidget.addItem('нет файлов в этой папке')
-		#____________________________________________________only for Linux
-		elif os.path.isfile(dir_now) and (dir_now.endswith('.jpg') or dir_now.endswith('.ico') or dir_now.endswith('.png')):
+		#____________________________________________________
+		elif os.path.isfile(dir_now) and (dir_now.endswith('.jpg') or dir_now.endswith('.ico') or dir_now.endswith('.png')) and data['images_show_comand'] != '':
 			os.system(data['images_show_comand'] +  dir_now)
 		#____________________________________________________
-		elif os.path.isfile(dir_now) and (dir_now.endswith('.json') or dir_now.endswith('.py')):
+		elif os.path.isfile(dir_now) and (dir_now.endswith('.json') or dir_now.endswith('.py')) and data['files_open_comand'] != '':
 			os.system(data['files_open_comand'] + dir_now)
-		elif os.path.isfile(dir_now):
+		elif os.path.isfile(dir_now) and data['other_file_open_comand'] != '':
 			os.system(data['other_file_open_comand'] + dir_now)
 		
 
@@ -132,7 +160,12 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
 			elif os.path.isfile(self.LineEdit.text() + self.listWidget.item(self.listWidget.currentRow() - 1).text()):
 				os.remove(self.LineEdit.text() + self.listWidget.item(self.listWidget.currentRow() - 1).text())
 			self.set_items()
-		# elif item.text() == '    rename':
+		elif item.text() == '    rename':
+			app1 = QtWidgets.QApplication(sys.argv)
+			window1 = App()
+			window1.show()
+			app1.exec_()
+
 		elif item.text() == '    copy':
 			copy()
 
