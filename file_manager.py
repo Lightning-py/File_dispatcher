@@ -120,9 +120,7 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
             result = file_search(current_dir)
             self.LineEdit.setText(current_dir)
             self.listWidget.clear()
-            self.listWidget.addItem(
-                f"|>	{len(result[0])}				папок---------------------------------------------------------------------------------"
-            )
+            self.listWidget.addItem(f"|>	{len(result[0])}				папок{'-'*80}")
             if len(result[0]) != 0:
                 if len(result[0]) >= 16:
                     self.listWidget.addItems(result[0][:15] + ["d---->"])
@@ -132,9 +130,7 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
                     array[0] = "full_dirs"
             else:
                 self.listWidget.addItem("в этой папке нет вложенных папок")
-            self.listWidget.addItem(
-                f"|>	{len(result[1])}				файлов--------------------------------------------------------------------------------"
-            )
+            self.listWidget.addItem(f"|>	{len(result[1])}				файлов{'-'*80}")
             if len(result[1]) != 0:
                 if len(result[1]) >= 16:
                     self.listWidget.addItems(result[1][:15] + ["f---->"])
@@ -144,7 +140,6 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
                     array[1] = "full_dirs"
             else:
                 self.listWidget.addItem("нет файлов в этой папке")
-        # ____________________________________________________
         elif (
             os.path.isfile(current_dir)
             and (
@@ -155,7 +150,6 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
             and data["images_show_comand"] != ""
         ):
             os.system(data["images_show_comand"] + current_dir)
-        # ____________________________________________________
         elif (
             os.path.isfile(current_dir)
             and (current_dir.endswith(".json") or current_dir.endswith(".py"))
@@ -177,9 +171,9 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
     def selectionChanged(self, item):
         text = deepcopy(item.text())
         if item.text() == "d---->":
-            self.set_items(arg="full_dirs", arg2=array[1])
+            self.set_items(arg="full_dirs", hide_files=array[1])
         elif item.text() == "f---->":
-            self.set_items(arg=array[0], arg2="full_files")
+            self.set_items(arg=array[0], hide_files="full_files")
         elif item.text() == "    delete":
             if os.path.isdir(
                 self.LineEdit.text()
@@ -261,7 +255,7 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
                 else:
                     self.listWidget.addItem("нет файлов в этой папке")
 
-    def set_items(self, arg="hide_dirs", arg2="hide_files"):
+    def set_items(self, hide_dirs=True, hide_files=True):
         if self.LineEdit.text() != "":
             if self.LineEdit.text().startswith("|>"):
                 try:
@@ -284,7 +278,7 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
                         f"|>	{len(result[0])}				папок---------------------------------------------------------------------------------"
                     )
                     if len(result[0]) != 0:
-                        if len(result[0]) >= 16 and arg == "hide_dirs":
+                        if len(result[0]) >= 16 and hide_dirs:
                             self.listWidget.addItems(result[0][:15] + ["d---->"])
                             array[0] = "hide_dirs"
                         else:
@@ -296,7 +290,7 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
                         f"|>	{len(result[1])}				файлов--------------------------------------------------------------------------------"
                     )
                     if len(result[1]) != 0:
-                        if len(result[1]) >= 16 and arg2 == "hide_files":
+                        if len(result[1]) >= 16 and hide_files:
                             self.listWidget.addItems(result[1][:15] + ["f---->"])
                             array[0] = "hide_files"
                         else:
