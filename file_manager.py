@@ -7,18 +7,17 @@ from PyQt5 import QtGui
 from pyperclip import copy
 
 
-def write_file(file):
-    f = open("./settings.txt", "r")
-    content = []
-    for i in f:
-        content.append(i)
-    f.close()
-    f = open("./settings.txt", "w")
-    for i in content:
-        if i.startswith("last_file: "):
-            f.write("last_file: " + "'" + file + "'")
-        else:
-            f.write(i)
+def write_file(filename):
+    content: list
+    with open(os.getcwd() + "/settings.txt", "r") as f:
+        content = [line for line in f]
+
+    with open(os.getcwd() + "/settings.txt", "w") as f:
+        for i in content:
+            if i.startswith("last_file: "):
+                f.write("last_file: " + "'" + filename + "'")
+            else:
+                f.write(i)
 
 
 data = {}
@@ -63,7 +62,7 @@ def file_search(cwd):
     return files
 
 
-array = ["hide_dirs", "hide_files"]
+config_hiding = {"hide dirs": True, "hide files": True}
 
 
 class App(QtWidgets.QDialog, design.Ui_get):
@@ -124,20 +123,20 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
             if len(result[0]) != 0:
                 if len(result[0]) >= 16:
                     self.listWidget.addItems(result[0][:15] + ["d---->"])
-                    array[0] = "hide_dirs"
+                    config_hiding["hide dirs"] = True
                 else:
                     self.listWidget.addItems(result[0])
-                    array[0] = "full_dirs"
+                    config_hiding["hide dirs"] = False
             else:
                 self.listWidget.addItem("в этой папке нет вложенных папок")
             self.listWidget.addItem(f"|>	{len(result[1])}				файлов{'-'*80}")
             if len(result[1]) != 0:
                 if len(result[1]) >= 16:
                     self.listWidget.addItems(result[1][:15] + ["f---->"])
-                    array[0] = "hide_files"
+                    config_hiding["hide files"] = True
                 else:
                     self.listWidget.addItems(result[1])
-                    array[1] = "full_dirs"
+                    config_hiding["hide files"] = False
             else:
                 self.listWidget.addItem("нет файлов в этой папке")
         elif (
@@ -171,9 +170,9 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
     def selectionChanged(self, item):
         text = deepcopy(item.text())
         if item.text() == "d---->":
-            self.set_items(arg="full_dirs", hide_files=array[1])
+            self.set_items(hide_dirs=False, hide_files=config_hiding["hide files"])
         elif item.text() == "f---->":
-            self.set_items(arg=array[0], hide_files="full_files")
+            self.set_items(hide_dirs=config_hiding["hide dirs"], hide_files=False)
         elif item.text() == "    delete":
             if os.path.isdir(
                 self.LineEdit.text()
@@ -197,19 +196,15 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
             window1 = App()
             window1.show()
             app1.exec_()
-
         elif item.text() == "    copy":
             copy()
-
         else:
             if os.path.isdir(self.LineEdit.text() + item.text()):
 
                 result = file_search(self.LineEdit.text())
                 self.listWidget.clear()
 
-                self.listWidget.addItem(
-                    f"|>	{len(result[0])}				папок---------------------------------------------------------------------------------"
-                )
+                self.listWidget.addItem(f"|>	{len(result[0])}				папок{'-'*80}")
                 if len(result[0]) != 0:
                     self.listWidget.addItems(
                         result[0][: result[0].index(text) + 1]
@@ -218,9 +213,7 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
                     )
                 else:
                     self.listWidget.addItem("в этой папке нет вложенных папок")
-                self.listWidget.addItem(
-                    f"|>	{len(result[1])}				файлов--------------------------------------------------------------------------------"
-                )
+                self.listWidget.addItem(f"|>	{len(result[1])}				файлов{'-'*80}")
                 if len(result[1]) != 0:
                     if len(result[1]) >= 16:
                         self.listWidget.addItems(result[1][:15] + ["f---->"])
@@ -233,9 +226,7 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
                 result = file_search(self.LineEdit.text())
                 self.listWidget.clear()
 
-                self.listWidget.addItem(
-                    f"|>	{len(result[0])}				папок---------------------------------------------------------------------------------"
-                )
+                self.listWidget.addItem(f"|>	{len(result[0])}				папок{'-'*80}")
                 if len(result[0]) != 0:
                     if len(result[0]) >= 16:
                         self.listWidget.addItems(result[0][:15] + ["d---->"])
@@ -243,9 +234,7 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
                         self.listWidget.addItems(result[0])
                 else:
                     self.listWidget.addItem("в этой папке нет вложенных папок")
-                self.listWidget.addItem(
-                    f"|>	{len(result[1])}				файлов--------------------------------------------------------------------------------"
-                )
+                self.listWidget.addItem(f"|>	{len(result[1])}				файлов{'-'*80}")
                 if len(result[1]) != 0:
                     self.listWidget.addItems(
                         result[1][: result[1].index(text) + 1]
@@ -274,28 +263,24 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
                 self.listWidget.clear()
                 try:
                     self.listWidget.clear()
-                    self.listWidget.addItem(
-                        f"|>	{len(result[0])}				папок---------------------------------------------------------------------------------"
-                    )
+                    self.listWidget.addItem(f"|>	{len(result[0])}				папок{'-'*80}")
                     if len(result[0]) != 0:
                         if len(result[0]) >= 16 and hide_dirs:
                             self.listWidget.addItems(result[0][:15] + ["d---->"])
-                            array[0] = "hide_dirs"
+                            config_hiding["hide dirs"] = True
                         else:
                             self.listWidget.addItems(result[0])
-                            array[0] = "full_dirs"
+                            config_hiding["hide dirs"] = False
                     else:
                         self.listWidget.addItem("в этой папке нет вложенных папок")
-                    self.listWidget.addItem(
-                        f"|>	{len(result[1])}				файлов--------------------------------------------------------------------------------"
-                    )
+                    self.listWidget.addItem(f"|>	{len(result[1])}				файлов{'-'*80}")
                     if len(result[1]) != 0:
                         if len(result[1]) >= 16 and hide_files:
                             self.listWidget.addItems(result[1][:15] + ["f---->"])
-                            array[0] = "hide_files"
+                            config_hiding["hide files"] = True
                         else:
                             self.listWidget.addItems(result[1])
-                            array[1] = "full_dirs"
+                            config_hiding["hide files"] = False
                     else:
                         self.listWidget.addItem("нет файлов в этой папке")
                     return
@@ -311,13 +296,13 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
                 return None
             result = file_search(self.scripts_LineEdit.text())
 
-            fiile = []
+            files = []
 
-            for files in result[1]:
-                if files.endswith(self.finder_LineEdit.text()):
-                    fiile.append(files)
+            for f in result[1]:
+                if f.endswith(self.finder_LineEdit.text()):
+                    files.append(f)
 
-            if len(fiile) == 0:
+            if len(files) == 0:
                 self.scripts_listWidget.clear()
                 self.scripts_listWidget.addItem(
                     f"файлов с расширением {self.finder_LineEdit.text()} в данной папке нет"
@@ -325,7 +310,7 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
                 self.scripts_listWidget.addItem("какая жалость, поищите в другой папке")
             else:
                 self.scripts_listWidget.clear()
-                self.scripts_listWidget.addItems(fiile)
+                self.scripts_listWidget.addItems(files)
         except Exception as e:
             print(e)
 

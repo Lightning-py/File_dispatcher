@@ -16,7 +16,11 @@ data = {}
 
 
 def get_comands():
-    f = open("./settings.txt")
+    """
+    ЭТО ЧТО? ЭТО ДЛЯ ЧЕГО? ЭТО КАК РАБОТАЕТ?
+    get_comands [summary]
+    """
+    f = open(os.getcwd() + "/settings.txt")
     global data
     for i in f:
         data[i[0 : i.index("'") - 2]] = i[i.index("'") + 1 :].replace("\n", "")[:-1]
@@ -25,21 +29,43 @@ def get_comands():
 get_comands()
 
 
-def write_file(file):
-    f = open("./settings.txt", "r")
-    content = []
-    for i in f:
-        content.append(i)
-    f.close()
-    f = open("./settings.txt", "w")
-    for i in content:
-        if i.startswith("last_file: "):
-            f.write("last_file: " + file)
-        else:
-            f.write(i)
+def write_file(filename):
+    """
+    write_file [summary]
+    ЭТО ЧТО? ЭТО ДЛЯ ЧЕГО? ЭТО КАК РАБОТАЕТ?
+
+    Parameters
+    ----------
+    filename : [type]
+        [description]
+    """
+    content: list
+    with open(os.getcwd() + "/settings.txt", "r") as f:
+        content = [line for line in f]
+
+    with open(os.getcwd() + "/settings.txt", "w") as f:
+        for i in content:
+            if i.startswith("last_file: "):
+                f.write("last_file: " + filename)
+            else:
+                f.write(i)
 
 
 def file_search(cwd):
+    """
+    ЭТО ЧТО? ЭТО ДЛЯ ЧЕГО? ЭТО КАК РАБОТАЕТ?
+    file_search [summary]
+
+    Parameters
+    ----------
+    cwd : [type]
+        [description]
+
+    Returns
+    -------
+    [type]
+        [description]
+    """
     try:
         results = [str(i)[str(i).index("'") + 1 : -2] for i in os.scandir(cwd)]
     except:
@@ -64,10 +90,7 @@ def file_search(cwd):
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
-        # создаем окошко
-        # ----------------------------------------------------------------- функция только для создателя (ну либо пишите свой адрес картинки)
         Dialog.setWindowIcon(QtGui.QIcon(os.getcwd() + "/explorer_.ico"))
-        # ----------------------------------------------------------------- конец
         Dialog.setObjectName("not_Dialog")
         Dialog.title = "qwe"
         Dialog.resize(1920, 1080)
@@ -117,9 +140,7 @@ class Ui_Dialog(object):
         if data["last_file"] != "":
             results = file_search(data["last_file"])
             self.LineEdit.setText(data["last_file"])
-            self.listWidget.addItem(
-                f"|>	{len(results[0])}				папок---------------------------------------------------------------------------------"
-            )
+            self.listWidget.addItem(f"|>	{len(results[0])}				папок{'-'*80}")
             if len(results[0]) != 0:
                 if len(results[0]) >= 16:
                     self.listWidget.addItems(results[0][:16] + ["d---->"])
@@ -133,9 +154,7 @@ class Ui_Dialog(object):
         elif os.name == "posix":
             results = file_search("/")
             self.LineEdit.setText("/")
-            self.listWidget.addItem(
-                f"|>	{len(results[0])}				папок---------------------------------------------------------------------------------"
-            )
+            self.listWidget.addItem(f"|>	{len(results[0])}				папок{'-'*80}")
             if len(results[0]) != 0:
                 if len(results[0]) >= 16:
                     self.listWidget.addItems(results[0][:16] + ["d---->"])
@@ -149,9 +168,7 @@ class Ui_Dialog(object):
         elif os.name == "nt":
             results = file_search("C:\ ".replace(" ", ""))
             self.LineEdit.setText("C:\ ".replace(" ", ""))
-            self.listWidget.addItem(
-                f"|>	{len(results[0])}				папок---------------------------------------------------------------------------------"
-            )
+            self.listWidget.addItem(f"|>	{len(results[0])}				папок{'-'*80}")
             if len(results[0]) != 0:
                 if len(results[0]) >= 16:
                     self.listWidget.addItems(results[0][:16] + ["d---->"])
