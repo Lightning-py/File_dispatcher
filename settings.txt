@@ -1,3 +1,4 @@
-/home/sergey/fm/
-
-
+images_show_comand: ''
+files_open_comand: ''
+other_file_open_comand: ''
+last_file: ''
