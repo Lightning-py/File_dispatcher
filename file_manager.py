@@ -143,7 +143,7 @@ class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
                     self.listWidget.addItems(result[1])
                     array[1] = "full_dirs"
             else:
-                self.listWidget.addItem("нет файлов в этой папке")
+                self.listWidget.addItem("твою мать на авито продали")
         # ____________________________________________________
         elif (
             os.path.isfile(current_dir)
