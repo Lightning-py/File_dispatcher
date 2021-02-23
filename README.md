@@ -1,5 +1,7 @@
 # File_dispatcher
 
+## a simple file manager with minimal functionality
+
 ![](https://github.com/NOTNOTsergey/File_dispatcher/raw/main/manager_logo.png)
 
 # How to get it
