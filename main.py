@@ -74,8 +74,7 @@ def file_search(cwd):
 	return files
 
 
-array = ['hide_dirs', 'hide_files']
-# список для одного из методов класса (метод который просто ищет сожержимое папки, как file_search но только другой) 
+array = ['hide_dirs', 'hide_files'] 
 
 class ExampleApp(QtWidgets.QDialog, design.Ui_Dialog):
 
