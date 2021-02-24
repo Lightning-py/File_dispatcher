@@ -1,4 +1,4 @@
-images_show_comand: 'gwenview '
+images_show_comand: ''
 files_open_comand: ''
-other_file_open_comand: 'kate '
-last_file: '/home/sergey/File_dispatcher/'
+other_file_open_comand: ''
+last_file: ''
